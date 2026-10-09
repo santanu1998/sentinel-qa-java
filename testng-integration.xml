@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+  Integration and database layer. Asserts that an API call produced the state it claims to,
+  and that the store enforces the constraints the API is supposed to enforce.
+  No browser is started.
+-->
+<suite name="SentinelQA-Integration" parallel="false" verbose="1">
+
+    <listeners>
+        <listener class-name="com.sentinelqa.listeners.TestListener"/>
+        <listener class-name="com.sentinelqa.listeners.RetryTransformer"/>
+    </listeners>
+
+    <groups>
+        <run>
+            <include name="integration"/>
+            <exclude name="known-defects"/>
+        </run>
+    </groups>
+
+    <test name="API to data-store integrity">
+        <packages>
+            <package name="com.sentinelqa.tests.integration"/>
+        </packages>
+    </test>
+</suite>

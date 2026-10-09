@@ -1,0 +1,118 @@
+# SentinelQA — Azure DevOps pipeline
+# Publishes results to Azure Test Plans so defects can be raised straight from a failed run.
+
+trigger:
+  branches:
+    include: [main, develop]
+
+schedules:
+  - cron: '30 1 * * *'
+    displayName: Nightly regression
+    branches:
+      include: [main]
+    always: true
+
+parameters:
+  - name: suite
+    displayName: TestNG suite
+    type: string
+    default: testng-smoke.xml
+    values: [testng-smoke.xml, testng-api.xml, testng-regression.xml]
+  - name: environment
+    displayName: Environment
+    type: string
+    default: qa
+    values: [qa, staging]
+
+variables:
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+
+stages:
+  - stage: Verify
+    displayName: Functional verification
+    jobs:
+      - job: ApiSuite
+        displayName: API suite
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: JavaToolInstaller@0
+            inputs:
+              versionSpec: '17'
+              jdkArchitectureOption: x64
+              jdkSourceOption: PreInstalled
+
+          - task: Cache@2
+            inputs:
+              key: 'maven | "$(Agent.OS)" | **/pom.xml'
+              path: $(MAVEN_CACHE_FOLDER)
+
+          - script: mvn -B clean test -Dsuite=testng-api.xml -Denv=${{ parameters.environment }}
+            displayName: Run API suite
+
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testResultsFormat: JUnit
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              testRunTitle: 'API suite — ${{ parameters.environment }}'
+
+      - job: UiSuite
+        displayName: UI suite
+        dependsOn: ApiSuite
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          matrix:
+            chrome:
+              browserName: chrome
+            firefox:
+              browserName: firefox
+        steps:
+          - task: JavaToolInstaller@0
+            inputs:
+              versionSpec: '17'
+              jdkArchitectureOption: x64
+              jdkSourceOption: PreInstalled
+
+          - script: >
+              mvn -B clean test
+              -Dsuite=${{ parameters.suite }}
+              -Dbrowser=$(browserName)
+              -Dheadless=true
+              -Denv=${{ parameters.environment }}
+            displayName: Run $(browserName) suite
+
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testResultsFormat: JUnit
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              testRunTitle: 'UI suite — $(browserName)'
+
+          - task: PublishPipelineArtifact@1
+            condition: always()
+            inputs:
+              targetPath: target/allure-results
+              artifact: allure-results-$(browserName)
+
+  - stage: Report
+    displayName: Publish report
+    dependsOn: Verify
+    condition: always()
+    jobs:
+      - job: Allure
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - download: current
+            patterns: '**/allure-results-*/**'
+          - script: |
+              npm install -g allure-commandline
+              allure generate $(Pipeline.Workspace)/allure-results-* --clean -o allure-report
+            displayName: Generate Allure report
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: allure-report
+              artifact: allure-report
