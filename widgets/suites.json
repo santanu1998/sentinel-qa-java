@@ -1,0 +1,1 @@
+{"total":2,"items":[{"uid":"3a998c520c5dfd2a7a53fbd45d353ebb","name":"SentinelQA-API","statistic":{"failed":0,"broken":0,"skipped":0,"passed":14,"unknown":0,"total":14}},{"uid":"13c75ebfa0d7517d0cd22ee552fa6501","name":"SentinelQA-Smoke","statistic":{"failed":0,"broken":0,"skipped":0,"passed":7,"unknown":0,"total":7}}]}
