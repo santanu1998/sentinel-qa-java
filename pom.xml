@@ -17,18 +17,22 @@
     </description>
 
     <properties>
-        <maven.compiler.release>17</maven.compiler.release>
+        <!-- Built and run on JDK 25. -->
+        <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <selenium.version>4.27.0</selenium.version>
         <testng.version>7.10.2</testng.version>
         <restassured.version>5.5.0</restassured.version>
         <allure.version>2.29.0</allure.version>
-        <aspectj.version>1.9.22.1</aspectj.version>
+        <!-- 1.9.24 is the first AspectJ that can weave Java 25 (class file major 69) bytecode;
+             Allure's @Step reporting depends on its load-time weaver. -->
+        <aspectj.version>1.9.24</aspectj.version>
         <jackson.version>2.18.1</jackson.version>
         <log4j.version>2.24.1</log4j.version>
         <h2.version>2.3.232</h2.version>
-        <surefire.version>3.5.2</surefire.version>
+        <compiler.plugin.version>3.14.0</compiler.plugin.version>
+        <surefire.version>3.5.3</surefire.version>
 
         <!-- Default suite; override with -Dsuite=testng-regression.xml -->
         <suite>testng-smoke.xml</suite>
@@ -119,8 +123,8 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[17,)</version>
-                                    <message>SentinelQA requires JDK 17 or newer.</message>
+                                    <version>[25,)</version>
+                                    <message>SentinelQA targets JDK 25. Build and run it on JDK 25 or newer.</message>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
                                     <version>[3.9.0,)</version>
@@ -130,6 +134,17 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Pinned so a different local Maven version cannot silently change the bytecode
+                 target. The release flag is what makes the JDK 25 build reproducible everywhere. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler.plugin.version}</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                </configuration>
             </plugin>
 
             <plugin>
