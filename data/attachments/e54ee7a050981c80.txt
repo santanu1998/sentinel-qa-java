@@ -1,5 +1,0 @@
-Bucket: PRODUCT_DEFECT
-Probable cause: A business assertion failed with the application reachable and responsive.
-Suggested actions:
- - Raise a defect with the exact expected/actual values.
- - Confirm the acceptance criterion in the linked user story.

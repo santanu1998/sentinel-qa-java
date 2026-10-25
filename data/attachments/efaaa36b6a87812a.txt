@@ -1,0 +1,5 @@
+Bucket: SYNCHRONISATION
+Probable cause: The element was not in a usable state within the wait budget.
+Suggested actions:
+ - Replace the implicit assumption with an explicit ExpectedCondition.
+ - Wait for the overlay or spinner to detach before interacting.

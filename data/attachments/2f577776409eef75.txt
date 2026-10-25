@@ -1,5 +1,0 @@
-Bucket: LOCATOR_DRIFT
-Probable cause: A selector was healed during this test, so the page markup changed.
-Suggested actions:
- - Element 'Sort selector': replace By.cssSelector: [data-test='product-sort-container'] with By.className: product_sort_container
- - Update the page object and remove the stale fallback.
