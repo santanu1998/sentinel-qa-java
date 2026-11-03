@@ -1,0 +1,5 @@
+Bucket: ENVIRONMENT
+Probable cause: The target environment or grid node was unreachable.
+Suggested actions:
+ - Check the environment health endpoint before re-running.
+ - Confirm the Selenium Grid node is registered.
