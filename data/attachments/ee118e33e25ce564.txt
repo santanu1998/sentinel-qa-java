@@ -1,5 +1,0 @@
-Bucket: LOCATOR_DRIFT
-Probable cause: A selector was healed during this test, so the page markup changed.
-Suggested actions:
- - Element 'Checkout button': replace By.cssSelector: [data-test='checkout'] with By.id: checkout
- - Update the page object and remove the stale fallback.
