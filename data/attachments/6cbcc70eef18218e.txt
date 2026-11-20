@@ -1,5 +1,0 @@
-Bucket: LOCATOR_DRIFT
-Probable cause: A selector was healed during this test, so the page markup changed.
-Suggested actions:
- - Element 'Add to cart: Sauce Labs Backpack': replace By.cssSelector: [data-test='add-to-cart-sauce-labs-backpack'] with By.xpath: //div[normalize-space(.)='Sauce Labs Backpack']/ancestor::div[contains(@class,'inventory_item')]//button[contains(.,'Add to cart')]
- - Update the page object and remove the stale fallback.
